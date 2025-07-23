@@ -1,0 +1,1120 @@
+import React, { useState, useEffect } from 'react';
+import { ChevronDown, ChevronRight, Users, MapPin, Search, Filter, Download, Maximize2, Building, Phone, Mail, Globe, User, UserCheck, Briefcase } from 'lucide-react';
+
+const AVLOrgChart = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [selectedLocation, setSelectedLocation] = useState('all');
+  const [expandedNodes, setExpandedNodes] = useState(new Set(['root']));
+  const [viewMode, setViewMode] = useState('tree'); // tree, grid, stats
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  // Complete organizational data extracted from the chart
+  const orgData = {
+    id: 'root',
+    name: 'Gernot Grasser',
+    title: 'Managing Director',
+    department: 'Executive',
+    location: 'SEA & Australia',
+    email: 'gernot.grasser@avl.com',
+    type: 'executive',
+    children: [
+      {
+        id: 'operations',
+        name: 'Philipp Eppel',
+        title: 'Operations and QM Manager',
+        department: 'Operations',
+        location: 'Bangkok',
+        type: 'manager',
+        children: []
+      },
+      {
+        id: 'finance',
+        name: 'Tascha Yucharoen',
+        title: 'Financial Controller',
+        department: 'Finance',
+        location: 'Bangkok',
+        type: 'manager',
+        children: [
+          {
+            id: 'finance-1',
+            name: 'N. N.',
+            title: 'Senior Finance Officer',
+            department: 'Finance',
+            location: 'Bangkok',
+            type: 'specialist'
+          }
+        ]
+      },
+      {
+        id: 'hr',
+        name: 'Wantida Wirushwong',
+        title: 'Human Resources & Office Manager',
+        department: 'HR & Administration',
+        location: 'Bangkok',
+        type: 'manager',
+        children: [
+          {
+            id: 'hr-admin-1',
+            name: 'H. D. P. W.',
+            title: 'Office Administrator',
+            department: 'Administration',
+            location: 'Bangkok',
+            type: 'specialist'
+          },
+          {
+            id: 'hr-admin-2',
+            name: 'K. Q. T.',
+            title: 'Office Administrator',
+            department: 'Administration',
+            location: 'Hanoi',
+            type: 'specialist'
+          },
+          {
+            id: 'hr-admin-3',
+            name: 'N. T. P. L.',
+            title: 'Office Administrator',
+            department: 'Administration',
+            location: 'Hanoi',
+            type: 'specialist'
+          },
+          {
+            id: 'hr-admin-4',
+            name: 'C. T.',
+            title: 'Office Administrator',
+            department: 'Administration',
+            location: 'Hanoi',
+            type: 'specialist'
+          },
+          {
+            id: 'hr-admin-5',
+            name: 'M. P.',
+            title: 'Office Maid (Outsourced)',
+            department: 'Administration',
+            location: 'Hanoi',
+            type: 'outsourced'
+          }
+        ]
+      },
+      {
+        id: 'commissioning',
+        name: 'Thanthep Puphunwivat',
+        title: 'Manager - Commissioning & Service Department',
+        department: 'Commissioning & Service',
+        location: 'Bangkok',
+        type: 'manager',
+        children: [
+          {
+            id: 'comm-assist-mgr',
+            name: 'K. P.',
+            title: 'Assistant Manager - Commissioning & Service Department',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'assistant_manager'
+          },
+          // Bangkok Commissioning Team
+          {
+            id: 'comm-bangkok-1',
+            name: 'S. P.',
+            title: 'Comm. & Service Eng. (Emission & CD)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-2',
+            name: 'C. S.',
+            title: 'Assistant Comm. & Service Dept.',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'assistant'
+          },
+          {
+            id: 'comm-bangkok-3',
+            name: 'C. S.',
+            title: 'Comm. & Service Eng (Emission) / Local Hotline',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-4',
+            name: 'S. K.',
+            title: 'Comm. & Service Eng. (Testbed)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-5',
+            name: 'S. W.',
+            title: 'Comm. Eng. (Front Loading)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-6',
+            name: 'N. H. N.',
+            title: 'Comm. Eng. (Powertrain - PT)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-7',
+            name: 'S. R.',
+            title: 'Comm. Eng. (Electrification Vehicle - EV)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-8',
+            name: 'B. B.',
+            title: 'Application Eng. (iGEM)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-9',
+            name: 'P. R.',
+            title: 'Comm. Eng. (iGEM)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-10',
+            name: 'P. S.',
+            title: 'Comm. Eng. (iGEM)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-11',
+            name: 'S. T.',
+            title: 'Comm. Eng. (Electrification Vehicle - EV / E-Motor Emulator - EME)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-12',
+            name: 'S. P.',
+            title: 'Comm. Eng. (iGEM)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-13',
+            name: 'S. R.',
+            title: 'Comm. Eng. (Electrification Vehicle – EV)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-bangkok-14',
+            name: 'T. P.',
+            title: 'Comm. Eng. (iGEM)',
+            department: 'Commissioning & Service',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          // Hanoi Commissioning Team
+          {
+            id: 'comm-hanoi-leader',
+            name: 'C. J.',
+            title: 'Sr. Comm. Eng. & Hotline Team Leader (Emission)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'team_leader'
+          },
+          {
+            id: 'comm-hanoi-1',
+            name: 'L. T. H.',
+            title: 'Sr. Comm. & Service Eng. (Engine)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'senior_engineer'
+          },
+          {
+            id: 'comm-hanoi-2',
+            name: 'D. T. N.',
+            title: 'Comm. Eng. (Engine)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-3',
+            name: 'T. H. N.',
+            title: 'Comm. Eng. (End of Line - EOL)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-4',
+            name: 'N. Q. H.',
+            title: 'Comm. & Service Eng (Electrification Vehicle - EV)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-5',
+            name: 'D. V. T.',
+            title: 'Comm. & Service Eng. (End of Line - EOL)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-6',
+            name: 'P. V. H.',
+            title: 'Sr.Comm. & Service Eng. (Engine)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'senior_engineer'
+          },
+          {
+            id: 'comm-hanoi-7',
+            name: 'N. V. T.',
+            title: 'Solution Engineer',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-8',
+            name: 'N. H. T.',
+            title: 'Comm. Eng. (Electrification Vehicle - EV)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-9',
+            name: 'T. Q. T.',
+            title: 'Comm. Eng. (Engine/Powertrain)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-10',
+            name: 'D. V. D.',
+            title: 'Comm. Eng. (Electrification Vehicle - EV)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-11',
+            name: 'N. Q. D.',
+            title: 'Comm. & Service Eng. (Emission)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-12',
+            name: 'O. F.',
+            title: 'Hotline Engineer',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-13',
+            name: 'T. K. N.',
+            title: 'Comm. Eng. (Engine / Fuel Cell)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-14',
+            name: 'J. M.',
+            title: 'Assistant Comm. & Service Dept. Hotline',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'assistant'
+          },
+          {
+            id: 'comm-hanoi-15',
+            name: 'N. P.',
+            title: 'Comm. Eng. (Engine)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-16',
+            name: 'K. R.',
+            title: 'Comm. & Service Eng. (Electrification Vehicle - EV)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-17',
+            name: 'K. B.',
+            title: 'Comm. Eng. (Powertrain)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-18',
+            name: 'N. S.',
+            title: 'Comm. Eng. (Powertrain)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-19',
+            name: 'P. D. T.',
+            title: 'Comm. Eng. (Electrification Vehicle - EV)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-20',
+            name: 'N. T. T.',
+            title: 'Comm. Eng. (Testbed)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-21',
+            name: 'N.K',
+            title: 'Comm. & Service Eng. (Engine/EV)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'comm-hanoi-22',
+            name: 'K.P',
+            title: 'Comm. & Service Eng. (Electrification Vehicle – EV)',
+            department: 'Commissioning & Service',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          // Jakarta Commissioning
+          {
+            id: 'comm-jakarta-1',
+            name: 'D. M. P.',
+            title: 'Comm. & Service Eng. (Engine / CSC Support)',
+            department: 'Commissioning & Service',
+            location: 'Jakarta',
+            type: 'engineer'
+          },
+          // Australia
+          {
+            id: 'comm-australia-1',
+            name: 'P. C.',
+            title: 'Resident Engineer',
+            department: 'Commissioning & Service',
+            location: 'Melbourne',
+            type: 'engineer'
+          }
+        ]
+      },
+      {
+        id: 'sales',
+        name: 'Siva Liewlom',
+        title: 'Sales & Marketing Manager - Instrumentation Test System',
+        department: 'Sales & Marketing',
+        location: 'Bangkok',
+        type: 'manager',
+        children: [
+          {
+            id: 'sales-1',
+            name: 'S. T.',
+            title: 'Senior Asst. Sales & Marketing Specialist',
+            department: 'Sales & Marketing',
+            location: 'Bangkok',
+            type: 'specialist'
+          },
+          {
+            id: 'sales-2',
+            name: 'S. P.',
+            title: 'Senior Sales Engineer',
+            department: 'Sales & Marketing',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'sales-3',
+            name: 'D. M. H. P.',
+            title: 'Sales Engineer',
+            department: 'Sales & Marketing',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'sales-4',
+            name: 'P. T.',
+            title: 'Sales Engineer',
+            department: 'Sales & Marketing',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'sales-5',
+            name: 'L.T',
+            title: 'Business Developer - SO Team PTE Sales',
+            department: 'Sales & Marketing',
+            location: 'Bangkok',
+            type: 'developer'
+          }
+        ]
+      },
+      {
+        id: 'project-mgmt',
+        name: 'T. P.',
+        title: 'Team Leader - Project Management',
+        department: 'Project Management',
+        location: 'Bangkok',
+        type: 'team_leader',
+        children: [
+          {
+            id: 'pm-1',
+            name: 'P. P.',
+            title: 'Project Manager',
+            department: 'Project Management',
+            location: 'Bangkok',
+            type: 'manager'
+          },
+          {
+            id: 'pm-2',
+            name: 'N. N.',
+            title: 'Senior Project Manager',
+            department: 'Project Management',
+            location: 'Bangkok',
+            type: 'senior_manager'
+          },
+          {
+            id: 'pm-3',
+            name: 'L. T.',
+            title: 'Project Manager',
+            department: 'Project Management',
+            location: 'Bangkok',
+            type: 'manager'
+          },
+          {
+            id: 'qm-assist',
+            name: 'N. J. T.',
+            title: 'Quality Management & Project Management Assistant',
+            department: 'Project Management',
+            location: 'Bangkok',
+            type: 'assistant'
+          },
+          // Vietnam PM
+          {
+            id: 'pm-vietnam',
+            name: 'V. H. N.',
+            title: 'Project Manager',
+            department: 'Project Management',
+            location: 'Hanoi',
+            type: 'manager'
+          }
+        ]
+      },
+      {
+        id: 'facility-eng',
+        name: 'P. B.',
+        title: 'Team Leader - Facility Engineer',
+        department: 'Facility Engineering',
+        location: 'Bangkok',
+        type: 'team_leader',
+        children: [
+          {
+            id: 'facility-1',
+            name: 'A. L.',
+            title: 'Test Facility Planning Engineer',
+            department: 'Facility Engineering',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'facility-2',
+            name: 'R. F.',
+            title: 'Test Facility Planning Engineer',
+            department: 'Facility Engineering',
+            location: 'Bangkok',
+            type: 'engineer'
+          },
+          {
+            id: 'facility-3',
+            name: 'V. V. T.',
+            title: 'Test Facility Planning Engineer',
+            department: 'Facility Engineering',
+            location: 'Hanoi',
+            type: 'engineer'
+          },
+          {
+            id: 'facility-assistant',
+            name: 'Facility Engineering Team Assistant',
+            title: 'Team Assistant',
+            department: 'Facility Engineering',
+            location: 'Bangkok',
+            type: 'assistant'
+          }
+        ]
+      },
+      {
+        id: 'order-processing',
+        name: 'P. K.',
+        title: 'Team Leader - Order Processing',
+        department: 'Order Processing & Logistics',
+        location: 'Bangkok',
+        type: 'team_leader',
+        children: [
+          {
+            id: 'order-1',
+            name: 'K. M.',
+            title: 'Order Processing Specialist',
+            department: 'Order Processing & Logistics',
+            location: 'Bangkok',
+            type: 'specialist'
+          }
+        ]
+      },
+      {
+        id: 'it-coord',
+        name: 'J. K.',
+        title: 'IT Coordinator',
+        department: 'IT',
+        location: 'Bangkok',
+        type: 'coordinator'
+      },
+      {
+        id: 'site-supervision',
+        name: 'N. C.',
+        title: 'Installation Supervisor',
+        department: 'Site Supervision',
+        location: 'Bangkok',
+        type: 'supervisor'
+      },
+      // Country Managers
+      {
+        id: 'vietnam',
+        name: 'Pham Ngoc Tu',
+        title: 'Country Manager Vietnam',
+        department: 'Management',
+        location: 'Hanoi',
+        type: 'country_manager',
+        children: [
+          {
+            id: 'vietnam-admin',
+            name: 'L. T. T. T.',
+            title: 'Office Administrator',
+            department: 'Administration',
+            location: 'Hanoi',
+            type: 'specialist'
+          },
+          {
+            id: 'vietnam-expert',
+            name: 'L. H. B.',
+            title: 'Application Expert',
+            department: 'Technical',
+            location: 'Hanoi',
+            type: 'expert'
+          }
+        ]
+      },
+      {
+        id: 'indonesia',
+        name: 'Irma Fitrasari',
+        title: 'Country Manager Indonesia',
+        department: 'Management',
+        location: 'Jakarta',
+        type: 'country_manager'
+      },
+      // External Partners
+      {
+        id: 'hisco',
+        name: 'Mr. Hoe Min',
+        title: 'General Manager HISCO (5 employees)',
+        department: 'External Partner',
+        location: 'Malaysia',
+        type: 'external'
+      },
+      {
+        id: 'winsmex',
+        name: 'Mr. Aggi Kao',
+        title: 'General Manager WINSMEX (16 employees)',
+        department: 'External Partner',
+        location: 'Taiwan',
+        type: 'external'
+      }
+    ]
+  };
+
+  // Statistics
+  const getStatistics = () => {
+    const flatten = (node, acc = []) => {
+      acc.push(node);
+      if (node.children) {
+        node.children.forEach(child => flatten(child, acc));
+      }
+      return acc;
+    };
+
+    const allEmployees = flatten(orgData);
+    
+    const locationStats = allEmployees.reduce((acc, emp) => {
+      acc[emp.location] = (acc[emp.location] || 0) + 1;
+      return acc;
+    }, {});
+
+    const departmentStats = allEmployees.reduce((acc, emp) => {
+      acc[emp.department] = (acc[emp.department] || 0) + 1;
+      return acc;
+    }, {});
+
+    const typeStats = allEmployees.reduce((acc, emp) => {
+      acc[emp.type] = (acc[emp.type] || 0) + 1;
+      return acc;
+    }, {});
+
+    return {
+      total: allEmployees.length,
+      locations: locationStats,
+      departments: departmentStats,
+      types: typeStats
+    };
+  };
+
+  const stats = getStatistics();
+
+  const toggleExpanded = (nodeId) => {
+    const newExpanded = new Set(expandedNodes);
+    if (newExpanded.has(nodeId)) {
+      newExpanded.delete(nodeId);
+    } else {
+      newExpanded.add(nodeId);
+    }
+    setExpandedNodes(newExpanded);
+  };
+
+  const getTypeColor = (type) => {
+    const colors = {
+      executive: 'bg-purple-600 border-purple-700',
+      manager: 'bg-blue-600 border-blue-700',
+      senior_manager: 'bg-blue-700 border-blue-800',
+      assistant_manager: 'bg-blue-500 border-blue-600',
+      team_leader: 'bg-green-600 border-green-700',
+      country_manager: 'bg-red-600 border-red-700',
+      engineer: 'bg-teal-600 border-teal-700',
+      senior_engineer: 'bg-teal-700 border-teal-800',
+      specialist: 'bg-indigo-600 border-indigo-700',
+      coordinator: 'bg-orange-600 border-orange-700',
+      supervisor: 'bg-yellow-600 border-yellow-700',
+      assistant: 'bg-gray-600 border-gray-700',
+      external: 'bg-pink-600 border-pink-700',
+      outsourced: 'bg-gray-500 border-gray-600',
+      expert: 'bg-cyan-600 border-cyan-700',
+      developer: 'bg-emerald-600 border-emerald-700'
+    };
+    return colors[type] || 'bg-gray-600 border-gray-700';
+  };
+
+  const getTypeIcon = (type) => {
+    switch(type) {
+      case 'executive': return '👑';
+      case 'manager': case 'senior_manager': case 'assistant_manager': return '👨‍💼';
+      case 'team_leader': return '🎯';
+      case 'country_manager': return '🌍';
+      case 'engineer': case 'senior_engineer': return '⚙️';
+      case 'specialist': return '🔧';
+      case 'coordinator': return '📋';
+      case 'supervisor': return '👁️';
+      case 'assistant': return '📝';
+      case 'external': return '🤝';
+      case 'outsourced': return '🔗';
+      case 'expert': return '🎓';
+      case 'developer': return '💻';
+      default: return '👤';
+    }
+  };
+
+  const filterEmployees = (node) => {
+    const matchesSearch = searchTerm === '' || 
+      node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      node.title.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesDepartment = selectedDepartment === 'all' || node.department === selectedDepartment;
+    const matchesLocation = selectedLocation === 'all' || node.location === selectedLocation;
+
+    return matchesSearch && matchesDepartment && matchesLocation;
+  };
+
+  const renderNode = (node, level = 0) => {
+    const isExpanded = expandedNodes.has(node.id);
+    const hasChildren = node.children && node.children.length > 0;
+    const matches = filterEmployees(node);
+
+    if (!matches) return null;
+
+    return (
+      <div key={node.id} className="mb-2">
+        <div 
+          className={`p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-lg cursor-pointer ${getTypeColor(node.type)} text-white`}
+          style={{ marginLeft: `${level * 20}px` }}
+          onClick={() => {
+            if (hasChildren) toggleExpanded(node.id);
+            setSelectedEmployee(node);
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              {hasChildren && (
+                <button className="hover:bg-white/20 p-1 rounded">
+                  {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
+              )}
+              <span className="text-xl">{getTypeIcon(node.type)}</span>
+              <div>
+                <h3 className="font-bold text-lg">{node.name}</h3>
+                <p className="text-sm opacity-90">{node.title}</p>
+                <div className="flex items-center space-x-2 mt-1">
+                  <MapPin size={12} />
+                  <span className="text-xs">{node.location}</span>
+                  <Building size={12} />
+                  <span className="text-xs">{node.department}</span>
+                </div>
+              </div>
+            </div>
+            {hasChildren && (
+              <div className="bg-white/20 px-2 py-1 rounded-full text-xs">
+                {node.children.length} {node.children.length === 1 ? 'report' : 'reports'}
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {isExpanded && hasChildren && (
+          <div className="mt-2">
+            {node.children.map(child => renderNode(child, level + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderGridView = () => {
+    const flatten = (node, acc = []) => {
+      if (filterEmployees(node)) acc.push(node);
+      if (node.children) {
+        node.children.forEach(child => flatten(child, acc));
+      }
+      return acc;
+    };
+
+    const allEmployees = flatten(orgData);
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {allEmployees.map(employee => (
+          <div 
+            key={employee.id} 
+            className={`p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-lg cursor-pointer ${getTypeColor(employee.type)} text-white`}
+            onClick={() => setSelectedEmployee(employee)}
+          >
+            <div className="flex items-center space-x-3 mb-2">
+              <span className="text-2xl">{getTypeIcon(employee.type)}</span>
+              <div>
+                <h3 className="font-bold">{employee.name}</h3>
+                <p className="text-sm opacity-90">{employee.title}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2 text-xs">
+              <MapPin size={12} />
+              <span>{employee.location}</span>
+            </div>
+            <div className="flex items-center space-x-2 text-xs mt-1">
+              <Briefcase size={12} />
+              <span>{employee.department}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderStatsView = () => {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 rounded-lg text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm opacity-90">Total Employees</p>
+                <p className="text-3xl font-bold">{stats.total}</p>
+              </div>
+              <Users size={32} />
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-r from-green-600 to-green-700 p-6 rounded-lg text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm opacity-90">Locations</p>
+                <p className="text-3xl font-bold">{Object.keys(stats.locations).length}</p>
+              </div>
+              <MapPin size={32} />
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 rounded-lg text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm opacity-90">Departments</p>
+                <p className="text-3xl font-bold">{Object.keys(stats.departments).length}</p>
+              </div>
+              <Building size={32} />
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-r from-orange-600 to-orange-700 p-6 rounded-lg text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm opacity-90">Role Types</p>
+                <p className="text-3xl font-bold">{Object.keys(stats.types).length}</p>
+              </div>
+              <UserCheck size={32} />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-bold mb-4 text-gray-800">Employees by Location</h3>
+            <div className="space-y-2">
+              {Object.entries(stats.locations).map(([location, count]) => (
+                <div key={location} className="flex justify-between items-center">
+                  <span className="text-gray-700">{location}</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium">
+                      {count}
+                    </div>
+                    <div className="w-20 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full" 
+                        style={{ width: `${(count / stats.total) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-bold mb-4 text-gray-800">Employees by Department</h3>
+            <div className="space-y-2">
+              {Object.entries(stats.departments).map(([department, count]) => (
+                <div key={department} className="flex justify-between items-center">
+                  <span className="text-gray-700 text-sm">{department}</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">
+                      {count}
+                    </div>
+                    <div className="w-20 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-green-600 h-2 rounded-full" 
+                        style={{ width: `${(count / stats.total) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-800 mb-2">AVL SEA & AUSTRALIA</h1>
+              <p className="text-gray-600">Interactive Organization Chart - Version 16.02.2025</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                <Users size={16} className="inline mr-2" />
+                {stats.total} Employees
+              </div>
+            </div>
+          </div>
+
+          {/* View Mode Tabs */}
+          <div className="flex space-x-1 bg-gray-200 p-1 rounded-lg mb-4">
+            <button
+              onClick={() => setViewMode('tree')}
+              className={`px-4 py-2 rounded-lg transition-all ${
+                viewMode === 'tree' 
+                  ? 'bg-white text-blue-600 shadow-md' 
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Tree View
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-4 py-2 rounded-lg transition-all ${
+                viewMode === 'grid' 
+                  ? 'bg-white text-blue-600 shadow-md' 
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Grid View
+            </button>
+            <button
+              onClick={() => setViewMode('stats')}
+              className={`px-4 py-2 rounded-lg transition-all ${
+                viewMode === 'stats' 
+                  ? 'bg-white text-blue-600 shadow-md' 
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Statistics
+            </button>
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div className="flex items-center space-x-2">
+              <Search size={16} className="text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search employees..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <select
+              value={selectedDepartment}
+              onChange={(e) => setSelectedDepartment(e.target.value)}
+              className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Departments</option>
+              {Object.keys(stats.departments).map(dept => (
+                <option key={dept} value={dept}>{dept}</option>
+              ))}
+            </select>
+            
+            <select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Locations</option>
+              {Object.keys(stats.locations).map(loc => (
+                <option key={loc} value={loc}>{loc}</option>
+              ))}
+            </select>
+            
+            <button className="flex items-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              <Download size={16} />
+              <span>Export</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex gap-6">
+          <div className="flex-1">
+            {viewMode === 'tree' && renderNode(orgData)}
+            {viewMode === 'grid' && renderGridView()}
+            {viewMode === 'stats' && renderStatsView()}
+          </div>
+
+          {/* Employee Details Sidebar */}
+          {selectedEmployee && (
+            <div className="w-80 bg-white rounded-lg shadow-lg p-6 h-fit">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-800">Employee Details</h3>
+                <button 
+                  onClick={() => setSelectedEmployee(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">{getTypeIcon(selectedEmployee.type)}</div>
+                  <h4 className="font-bold text-xl text-gray-800">{selectedEmployee.name}</h4>
+                  <p className="text-gray-600">{selectedEmployee.title}</p>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Building size={16} className="text-gray-500" />
+                    <span className="text-gray-700">{selectedEmployee.department}</span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <MapPin size={16} className="text-gray-500" />
+                    <span className="text-gray-700">{selectedEmployee.location}</span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <User size={16} className="text-gray-500" />
+                    <span className="text-gray-700 capitalize">{selectedEmployee.type.replace('_', ' ')}</span>
+                  </div>
+                  
+                  {selectedEmployee.email && (
+                    <div className="flex items-center space-x-2">
+                      <Mail size={16} className="text-gray-500" />
+                      <span className="text-gray-700">{selectedEmployee.email}</span>
+                    </div>
+                  )}
+                </div>
+                
+                {selectedEmployee.children && selectedEmployee.children.length > 0 && (
+                  <div className="border-t pt-4">
+                    <h5 className="font-semibold text-gray-800 mb-2">Direct Reports</h5>
+                    <div className="text-sm text-gray-600">
+                      {selectedEmployee.children.length} {selectedEmployee.children.length === 1 ? 'person' : 'people'} report to this position
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-gray-500 text-sm">
+          <p>Organization Chart Version 16.02.2025 | Approved by: Mr. Gernot Grasser | Released by: Wantida Wirushwong</p>
+          <p className="mt-1">Total Existing Employees: 74 (Male: 58, Female: 16)</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AVLOrgChart;
